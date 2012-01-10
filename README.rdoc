@@ -1,0 +1,64 @@
+= ActiveRecord::Relation#each_model
+
+In contrast to each or find_each, each_model does not return an array and must be used
+in a block context and then it yields a model instance.
+
+== Example
+
+  # Iterates over all MyModels of the type 'car' and returns them in the reverse
+  # order of the field name:
+  MyModel.where("type = 'car'").order("name desc").each_model{|mm| puts mm.name}
+
+== Discussion
+The advantages are: each (and all other find methods) consume a lot of memory when you
+have a huge result set, since they generate a huge array of model instances. Lazy 
+loading only delays this problem to the moment, until the result_set is needed.
+
+find_each behaves exactly the same as each, but since you can limit the batch size,
+you can reduce the memory usage, but at the cost of sending the same query multiple
+times to the database, which can be time consuming. And you can only iterate in the
+order of the primary key.
+
+each_model does not produce an array at all, so the memory consumption is by far the
+lowest of all solutions, since only one model instance exists at the same time. It
+should always be fast, since in contrast to batches it sends only one query to the
+database. And for the same reason, you can return the result in every given order.
+
+== Problems
+Not every find method in ActiveRecord returns a Relation, so each_model can only
+be used when a Relation is returned. Then, there must be a reason, why ActiveRecord
+does always return an array rather than yielding the models. So I guess, there
+might be other problems as well.
+
+== Test it yourself?
+
+Clone the repo.
+
+  $ bundle
+  $ rake db:migrate
+  $ rake demo
+
+The simple demo code can be found in the demo task.
+
+== LICENSE
+
+Copyright (c) 2012 Thomas Volkmar Worm <tvw@s4r.de>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
