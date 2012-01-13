@@ -1,2 +1,12 @@
-adapter: sqlite3
-database: db/testdb.sqlite.db
+sqlite3:
+  adapter: sqlite3
+  database: db/testdb.sqlite.db
+
+mysql:
+  adapter: mysql2
+  encoding: utf8
+  database: ar_each_model
+  pool: 5
+  username: root
+  password:
+  socket: /var/run/mysqld/mysqld.sock
